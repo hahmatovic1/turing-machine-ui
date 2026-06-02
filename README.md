@@ -1,2 +1,2 @@
 # turing-machine-ui
-Frontend of Turing maching Spring Boot project
+Frontend of Turing machine Spring Boot project
