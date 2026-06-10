@@ -1,0 +1,12 @@
+<div class="examples-container">
+  <h3>Examples</h3>
+  <div class="examples-list">
+    <button
+      *ngFor="let example of examples"
+      class="example-btn"
+      (click)="selectExample(example)"
+    >
+      {{ example.name }}
+    </button>
+  </div>
+</div>

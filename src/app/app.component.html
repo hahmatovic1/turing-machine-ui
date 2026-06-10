@@ -1,5 +1,21 @@
 <main class="page">
-  <h1>Turing Machine Simulator</h1>
+  <h1 class="title">Turing Machine Simulator</h1>
 
-  <app-tape></app-tape>
+  <div class="tape-container">
+    <app-tape></app-tape>
+  </div>
+
+  <div class="bottom-section">
+    <div class="examples-column">
+      <app-examples (exampleSelected)="onExampleSelected($event)"></app-examples>
+    </div>
+    <div class="input-column">
+      <textarea
+        class="input-area"
+        placeholder="Enter input for the Turing machine"
+        [value]="inputValue()"
+        (input)="inputValue.set($any($event.target).value)"
+      ></textarea>
+    </div>
+  </div>
 </main>

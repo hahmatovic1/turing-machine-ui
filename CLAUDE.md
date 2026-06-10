@@ -7,18 +7,21 @@ When in doubt, prioritize clean, readable, well-structured code suitable for aca
 ## Tech Stack
 - **Framework:** Angular (latest)
 - **Component style:** Standalone components (no NgModules)
-- **Styling:** (update with your choice: TailwindCSS / Angular Material / SCSS)
-- **State management:** (update: NgRx / signals / services)
+- **Styling:** SCSS
+- **State management:** Angular **signals** (primary) with services for business logic
 - **Backend/API:** (update: REST API / Firebase / mock data)
 
 ## Code Style & Conventions
 - Use **standalone components** everywhere — never generate NgModule-based components
 - Use `inject()` instead of constructor injection for dependencies
-- Use Angular **signals** for local state where possible (`signal()`, `computed()`, `effect()`)
+- **Use Angular signals for all state management** — `signal()`, `computed()`, `effect()`
+  - Signals replace async pipe in most cases; bind directly in templates with `{{ signalName() }}`
+  - Use `computed()` for derived state, `effect()` for side effects
+  - Prefer signals over RxJS Observables for local state
 - Use `HttpClient` with typed responses — always define interfaces for API data
 - File naming: `feature-name.component.ts`, `feature-name.service.ts`, etc.
 - Keep components small and focused — extract logic into services
-- Use `async` pipe in templates instead of manual subscriptions
+- Use component outputs (`@Output()` / `output()`) for parent-child communication
 
 ## Folder Structure
 ```

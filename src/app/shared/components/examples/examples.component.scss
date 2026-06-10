@@ -1,0 +1,41 @@
+.examples-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+h3 {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.example-btn {
+  padding: 0.75rem 1rem;
+  background-color: #f1f5f9;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #1e293b;
+
+  &:hover {
+    background-color: #e0f2fe;
+    border-color: #1e40af;
+  }
+
+  &:active {
+    background-color: #3b82f6;
+    color: white;
+  }
+}
