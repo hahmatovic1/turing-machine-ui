@@ -1,1 +1,15 @@
-<div class="tape">TAPE</div>
+<div class="tape-wrapper">
+  <button class="arrow-btn left-arrow" (click)="scrollLeft()" [disabled]="scrollIndex() === 0">
+    ◄
+  </button>
+
+  <div class="tape">
+    <div *ngFor="let char of visibleCells" class="tape-cell">
+      {{ char || '□' }}
+    </div>
+  </div>
+
+  <button class="arrow-btn right-arrow" (click)="scrollRight()" [disabled]="scrollIndex() === maxScroll">
+    ►
+  </button>
+</div>

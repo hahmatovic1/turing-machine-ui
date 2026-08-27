@@ -1,8 +1,25 @@
 <main class="page">
   <h1 class="title">Turing Machine Simulator</h1>
 
-  <div class="tape-container">
-    <app-tape></app-tape>
+  <div class="tape-container" [class.dual-mode]="dualTapeMode()">
+    <app-tape [input]="inputValue()"></app-tape>
+    @if (dualTapeMode()) {
+      <app-tape [input]="inputValue()"></app-tape>
+    }
+  </div>
+
+  <div class="toggle-slider-container">
+    <label class="toggle-slider">
+      <input
+        type="checkbox"
+        [checked]="dualTapeMode()"
+        (change)="toggleDualTapeMode()"
+        class="toggle-slider-input"
+      >
+      <span class="slider">
+        <span class="slider-text">{{ dualTapeMode() ? 'Dual' : 'Single' }}</span>
+      </span>
+    </label>
   </div>
 
   <div class="bottom-section">
@@ -14,7 +31,7 @@
         class="input-area"
         placeholder="Enter input for the Turing machine"
         [value]="inputValue()"
-        (input)="inputValue.set($any($event.target).value)"
+        (input)="onInputChange($any($event.target).value)"
       ></textarea>
     </div>
   </div>

@@ -1,7 +1,56 @@
+.tape-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
 .tape {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tape-cell {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Courier New', monospace;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: bold;
+  color: #1e293b;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.arrow-btn {
+  background-color: #3b82f6;
   color: white;
-  text-align: center;
+  border: none;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #1e40af;
+  }
+
+  &:active:not(:disabled) {
+    background-color: #1e3a8a;
+  }
+
+  &:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+  }
 }

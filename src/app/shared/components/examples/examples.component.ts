@@ -20,7 +20,11 @@ export class ExamplesComponent {
     { name: 'Hello World', input: '01010101' },
     { name: 'Count', input: '1111' },
     { name: 'Palindrome', input: 'abba' },
-    { name: 'Binary Add', input: '101+11' }
+    { name: 'Binary Add', input: '101+11' },
+    { name: 'Example 5', input: 'aaaabbbb' },
+    { name: 'Example 6', input: 'test123' },
+    { name: 'Example 7', input: 'input7' },
+    { name: 'Example 8', input: 'input8' }
   ];
 
   selectExample(example: Example) {

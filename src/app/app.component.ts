@@ -13,8 +13,17 @@ import { ExamplesComponent } from './shared/components/examples/examples.compone
 export class AppComponent {
   title = 'turing-machine-ui';
   inputValue = signal<string>('');
+  dualTapeMode = signal<boolean>(false);
 
   onExampleSelected(exampleInput: string): void {
     this.inputValue.set(exampleInput);
+  }
+
+  onInputChange(value: string): void {
+    this.inputValue.set(value);
+  }
+
+  toggleDualTapeMode(): void {
+    this.dualTapeMode.set(!this.dualTapeMode());
   }
 }
