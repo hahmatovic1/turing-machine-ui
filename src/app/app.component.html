@@ -8,31 +8,94 @@
     }
   </div>
 
-  <div class="toggle-slider-container">
-    <label class="toggle-slider">
-      <input
-        type="checkbox"
-        [checked]="dualTapeMode()"
-        (change)="toggleDualTapeMode()"
-        class="toggle-slider-input"
-      >
-      <span class="slider">
-        <span class="slider-text">{{ dualTapeMode() ? 'Dual' : 'Single' }}</span>
-      </span>
-    </label>
-  </div>
-
   <div class="bottom-section">
     <div class="examples-column">
       <app-examples (exampleSelected)="onExampleSelected($event)"></app-examples>
+      <div class="toggle-slider-container">
+        <label class="toggle-slider">
+          <input
+            type="checkbox"
+            [checked]="dualTapeMode()"
+            (change)="toggleDualTapeMode()"
+            class="toggle-slider-input"
+          >
+          <span class="slider">
+            <span class="slider-text">{{ dualTapeMode() ? 'Dual' : 'Single' }}</span>
+          </span>
+        </label>
+      </div>
     </div>
-    <div class="input-column">
-      <textarea
-        class="input-area"
-        placeholder="Enter input for the Turing machine"
-        [value]="inputValue()"
-        (input)="onInputChange($any($event.target).value)"
-      ></textarea>
+
+    <div class="right-column">
+      <div class="tape-input-section">
+        <div class="state-and-controls">
+          <div class="current-state">
+            <label>State:</label>
+            <span class="state-value">{{ currentState() || '—' }}</span>
+          </div>
+          <div class="control-buttons">
+            <button
+              class="control-btn play-btn"
+              (click)="playMachine()"
+              [disabled]="!isMachineValid() || isRunning()"
+              title="Play machine"
+            >
+              ▶
+            </button>
+            <button
+              class="control-btn stop-btn"
+              (click)="stopMachine()"
+              [disabled]="!isMachineValid() || !isRunning()"
+              title="Stop machine"
+            >
+              ⏹
+            </button>
+            <button
+              class="control-btn revert-btn"
+              (click)="revertMachine()"
+              [disabled]="!isMachineValid()"
+              title="Revert to initial state"
+            >
+              ↻
+            </button>
+          </div>
+        </div>
+        <h2>Tape Input</h2>
+        <input
+          type="text"
+          class="tape-input-field"
+          placeholder="Enter input for the Turing machine tape"
+          [value]="inputValue()"
+          (input)="onInputChange($any($event.target).value)"
+        />
+        @if (tapeValidationError()) {
+          <div class="error-messages">
+            <p class="error">{{ tapeValidationError() }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="config-column">
+        <h2>Turing Machine Configuration</h2>
+        <textarea
+          class="config-area"
+          [value]="turingMachineConfig()"
+          (input)="onConfigChange($any($event.target).value)"
+        ></textarea>
+        <div class="config-actions">
+          <button (click)="loadExampleConfig()" class="load-example-btn">Load Example</button>
+          @if (isMachineValid()) {
+            <div class="success-message">✓ Configuration valid</div>
+          }
+        </div>
+        @if (configErrors().length > 0) {
+          <div class="error-messages">
+            @for (error of configErrors(); track $index) {
+              <p class="error">{{ error }}</p>
+            }
+          </div>
+        }
+      </div>
     </div>
   </div>
 </main>

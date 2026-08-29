@@ -4,8 +4,12 @@
   </button>
 
   <div class="tape">
-    <div *ngFor="let char of visibleCells" class="tape-cell">
-      {{ char || '□' }}
+    <div
+      *ngFor="let char of visibleCells; let i = index"
+      class="tape-cell"
+      [class.head-position]="i === headPositionInView"
+    >
+      {{ char || '_' }}
     </div>
   </div>
 

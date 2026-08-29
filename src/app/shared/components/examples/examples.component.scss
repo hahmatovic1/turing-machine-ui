@@ -24,7 +24,7 @@ h3 {
 .example-btn {
   padding: 0.75rem 1rem;
   background-color: #f1f5f9;
-  border: 2px solid #3b82f6;
+  border: 2px solid #10b981;
   border-radius: 6px;
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
@@ -33,12 +33,12 @@ h3 {
   color: #1e293b;
 
   &:hover {
-    background-color: #e0f2fe;
-    border-color: #1e40af;
+    background-color: #d1fae5;
+    border-color: #047857;
   }
 
   &:active {
-    background-color: #3b82f6;
+    background-color: #10b981;
     color: white;
   }
 }
