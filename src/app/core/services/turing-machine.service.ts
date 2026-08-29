@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TuringMachine, Transition } from '../../models/turing-machine.model';
+import { TuringMachine, Transition, TransitionTuple } from '../../models/turing-machine.model';
 
 interface TuringMachineConfig {
   states: string[];
@@ -8,7 +8,7 @@ interface TuringMachineConfig {
   initialState: string;
   blank: string;
   finalStates: string[];
-  transitions: Transition[];
+  transitions: (TransitionTuple | Transition)[];
 }
 
 @Injectable({
@@ -62,7 +62,24 @@ export class TuringMachineService {
       if (!config.transitions || !Array.isArray(config.transitions)) {
         errors.push('transitions must be an array');
       } else {
-        machine.transitions = config.transitions;
+        machine.transitions = config.transitions.map((t, index) => {
+          // Handle tuple format [currentState, readSymbol, nextState, writeSymbol, moveDirection]
+          if (Array.isArray(t)) {
+            if (t.length !== 5) {
+              errors.push(`Transition ${index} must be a tuple of [currentState, readSymbol, nextState, writeSymbol, moveDirection]`);
+              return null;
+            }
+            return {
+              currentState: t[0],
+              readSymbol: t[1],
+              nextState: t[2],
+              writeSymbol: t[3],
+              moveDirection: t[4] as 'L' | 'R'
+            };
+          }
+          // Handle object format
+          return t as Transition;
+        }).filter((t): t is Transition => t !== null);
       }
 
       return { machine, errors };
@@ -73,33 +90,14 @@ export class TuringMachineService {
   }
 
   getExampleConfiguration(): string {
-    return JSON.stringify(
-      {
-        states: ['q0', 'q1', 'q2'],
-        inputAlphabet: ['0', '1'],
-        tapeAlphabet: ['0', '1', '_'],
-        initialState: 'q0',
-        blank: '_',
-        finalStates: ['q2'],
-        transitions: [
-          {
-            currentState: 'q0',
-            readSymbol: '0',
-            nextState: 'q1',
-            writeSymbol: '1',
-            moveDirection: 'R'
-          },
-          {
-            currentState: 'q1',
-            readSymbol: '1',
-            nextState: 'q2',
-            writeSymbol: '0',
-            moveDirection: 'L'
-          }
-        ]
-      },
-      null,
-      2
-    );
+    return `{
+  "states": ["q0", "q1", "q2"],
+  "inputAlphabet": ["0", "1"],
+  "tapeAlphabet": ["0", "1", "_"],
+  "initialState": "q0",
+  "blank": "_",
+  "finalStates": ["q2"],
+  "transitions": [["q0", "0", "q1", "1", "R"], ["q1", "1", "q2", "0", "L"]]
+}`;
   }
 }

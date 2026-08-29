@@ -1,5 +1,5 @@
 //based on the TM definition
-export class TuringMachine { 
+export class TuringMachine {
     states = new Set<string>();
     inputAlphabet = new Set<string>();
     tapeAlphabet = new Set<string>();
@@ -17,4 +17,5 @@ export interface Transition {
   moveDirection: MoveDirection;
 }
 
+export type TransitionTuple = [string, string, string, string, 'L' | 'R'];
 export type MoveDirection = 'L' | 'R';

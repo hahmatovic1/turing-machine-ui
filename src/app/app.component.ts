@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { TapeComponent } from './shared/components/tape/tape.component';
 import { ExamplesComponent } from './shared/components/examples/examples.component';
 import { TuringMachineService } from './core/services/turing-machine.service';
-import { TuringMachine } from './models/turing-machine.model';
+import { TuringMachine, Transition } from './models/turing-machine.model';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -28,6 +28,23 @@ export class AppComponent {
   tapeValidationError = signal<string>('');
 
   isMachineValid = computed(() => this.configErrors().length === 0 && this.currentMachine() !== null);
+
+  currentReadSymbol = computed(() => {
+    const input = this.inputValue();
+    return input.length > 0 ? input[0] : this.currentMachine()?.blank || '—';
+  });
+
+  nextTransition = computed(() => {
+    const machine = this.currentMachine();
+    const state = this.currentState();
+    const readSymbol = this.currentReadSymbol();
+
+    if (!machine || !state) return null;
+
+    return machine.transitions.find(
+      t => t.currentState === state && t.readSymbol === readSymbol
+    ) || null;
+  });
 
   onExampleSelected(exampleData: any): void {
     this.inputValue.set(exampleData.tapeInput);
