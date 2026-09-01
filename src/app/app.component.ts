@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { TapeComponent } from './shared/components/tape/tape.component';
 import { ExamplesComponent } from './shared/components/examples/examples.component';
 import { TuringMachineService } from './core/services/turing-machine.service';
@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   private turingMachineService = inject(TuringMachineService);
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   title = 'turing-machine-ui';
   inputValue = signal<string>('');
@@ -107,26 +108,66 @@ export class AppComponent {
     }
   }
 
+  toggleDualTapeMode(): void {
+    console.log('Dual/Single toggle pressed');
+    this.dualTapeMode.set(!this.dualTapeMode());
+  }
+
+  playMachine(): void {
+    console.log('Play button pressed');
+    this.isRunning.set(true);
+  }
+
+  stopMachine(): void {
+    console.log('Stop button pressed');
+    this.isRunning.set(false);
+  }
+
+  revertMachine(): void {
+    console.log('Revert button pressed');
+    this.isRunning.set(false);
+    this.currentState.set(this.initialState());
+  }
+
   loadExampleConfig(): void {
+    console.log('Load Example button pressed');
     const example = this.turingMachineService.getExampleConfiguration();
     this.turingMachineConfig.set(example);
     this.parseConfiguration(example);
   }
 
-  toggleDualTapeMode(): void {
-    this.dualTapeMode.set(!this.dualTapeMode());
+  importConfig(): void {
+    console.log('Import button pressed');
+    this.fileInput.nativeElement.click();
   }
 
-  playMachine(): void {
-    this.isRunning.set(true);
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (file) {
+      console.log('File selected for import:', file.name);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        this.turingMachineConfig.set(content);
+        this.parseConfiguration(content);
+      };
+      reader.readAsText(file);
+    }
+
+    input.value = '';
   }
 
-  stopMachine(): void {
-    this.isRunning.set(false);
-  }
-
-  revertMachine(): void {
-    this.isRunning.set(false);
-    this.currentState.set(this.initialState());
+  exportConfig(): void {
+    console.log('Export button pressed');
+    const config = this.turingMachineConfig();
+    const blob = new Blob([config], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'turing-machine-config.json';
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }

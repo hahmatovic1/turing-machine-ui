@@ -340,6 +340,33 @@
   }
 }
 
+.import-btn,
+.export-btn {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  background-color: #64748b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #475569;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+  }
+}
+
 .error-messages {
   padding: 0.75rem;
   background-color: #fee2e2;

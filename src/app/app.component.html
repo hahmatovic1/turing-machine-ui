@@ -110,6 +110,15 @@
         ></textarea>
         <div class="config-actions">
           <button (click)="loadExampleConfig()" class="load-example-btn">Load Example</button>
+          <button (click)="importConfig()" class="import-btn">Import</button>
+          <button (click)="exportConfig()" class="export-btn" [disabled]="!isMachineValid()">Export</button>
+          <input
+            #fileInput
+            type="file"
+            accept=".json"
+            style="display: none"
+            (change)="onFileSelected($event)"
+          />
           @if (isMachineValid()) {
             <div class="success-message">✓ Configuration valid</div>
           }
