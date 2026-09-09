@@ -26,38 +26,28 @@ export class ExamplesComponent {
     {
       name: 'Binary Incrementer',
       tapeInput: '101',
-      config: JSON.stringify({
-        states: ['q0', 'q1', 'q2'],
-        inputAlphabet: ['0', '1'],
-        tapeAlphabet: ['0', '1', '_'],
-        initialState: 'q0',
-        blank: '_',
-        finalStates: ['q2'],
-        transitions: [
-          { currentState: 'q0', readSymbol: '1', nextState: 'q0', writeSymbol: '1', moveDirection: 'R' },
-          { currentState: 'q0', readSymbol: '0', nextState: 'q0', writeSymbol: '0', moveDirection: 'R' },
-          { currentState: 'q0', readSymbol: '_', nextState: 'q1', writeSymbol: '1', moveDirection: 'L' },
-          { currentState: 'q1', readSymbol: '1', nextState: 'q1', writeSymbol: '0', moveDirection: 'L' },
-          { currentState: 'q1', readSymbol: '0', nextState: 'q2', writeSymbol: '1', moveDirection: 'R' }
-        ]
-      }, null, 2)
+      config: `{
+  "states": ["q0", "q1", "q2"],
+  "inputAlphabet": ["0", "1"],
+  "tapeAlphabet": ["0", "1", "_"],
+  "initialState": "q0",
+  "blank": "_",
+  "finalStates": ["q2"],
+  "transitions": [["q0", "1", "q0", "1", "R"], ["q0", "0", "q0", "0", "R"], ["q0", "_", "q1", "1", "L"], ["q1", "1", "q1", "0", "L"], ["q1", "0", "q2", "1", "R"]]
+}`
     },
     {
       name: 'Bit Flip',
       tapeInput: '010',
-      config: JSON.stringify({
-        states: ['q0', 'q1'],
-        inputAlphabet: ['0', '1'],
-        tapeAlphabet: ['0', '1', '_'],
-        initialState: 'q0',
-        blank: '_',
-        finalStates: ['q1'],
-        transitions: [
-          { currentState: 'q0', readSymbol: '0', nextState: 'q0', writeSymbol: '1', moveDirection: 'R' },
-          { currentState: 'q0', readSymbol: '1', nextState: 'q0', writeSymbol: '0', moveDirection: 'R' },
-          { currentState: 'q0', readSymbol: '_', nextState: 'q1', writeSymbol: '_', moveDirection: 'L' }
-        ]
-      }, null, 2)
+      config: `{
+  "states": ["q0", "q1"],
+  "inputAlphabet": ["0", "1"],
+  "tapeAlphabet": ["0", "1", "_"],
+  "initialState": "q0",
+  "blank": "_",
+  "finalStates": ["q1"],
+  "transitions": [["q0", "0", "q0", "1", "R"], ["q0", "1", "q0", "0", "R"], ["q0", "_", "q1", "_", "L"]]
+}`
     },
     {
       name: 'Count Ones',
@@ -69,11 +59,7 @@ export class ExamplesComponent {
         initialState: 'q0',
         blank: '_',
         finalStates: ['q2'],
-        transitions: [
-          { currentState: 'q0', readSymbol: '1', nextState: 'q0', writeSymbol: '1', moveDirection: 'R' },
-          { currentState: 'q0', readSymbol: '_', nextState: 'q1', writeSymbol: '_', moveDirection: 'L' },
-          { currentState: 'q1', readSymbol: '1', nextState: 'q2', writeSymbol: '1', moveDirection: 'R' }
-        ]
+        transitions: [["q0", "1", "q0", "1", "R"], ["q0", "_", "q1", "_", "L"], ["q1", "1", "q2", "1", "R"]]
       }, null, 2)
     }
   ];
