@@ -2,9 +2,9 @@
   <h1 class="title">Turing Machine Simulator</h1>
 
   <div class="tape-container" [class.dual-mode]="dualTapeMode()">
-    <app-tape [input]="inputValue()"></app-tape>
+    <app-tape [tapeInput]="inputValue()" [externalTapeContent]="tapeContent()" [externalHeadPosition]="headPosition()"></app-tape>
     @if (dualTapeMode()) {
-      <app-tape [input]="inputValue()"></app-tape>
+      <app-tape [tapeInput]="inputValue()" [externalTapeContent]="tapeContent()" [externalHeadPosition]="headPosition()"></app-tape>
     }
   </div>
 
