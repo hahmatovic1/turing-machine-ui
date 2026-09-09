@@ -52,15 +52,15 @@ export class ExamplesComponent {
     {
       name: 'Count Ones',
       tapeInput: '1111',
-      config: JSON.stringify({
-        states: ['q0', 'q1', 'q2'],
-        inputAlphabet: ['1'],
-        tapeAlphabet: ['1', '_'],
-        initialState: 'q0',
-        blank: '_',
-        finalStates: ['q2'],
-        transitions: [["q0", "1", "q0", "1", "R"], ["q0", "_", "q1", "_", "L"], ["q1", "1", "q2", "1", "R"]]
-      }, null, 2)
+      config: `{
+  "states": ["q0", "q1", "q2"],
+  "inputAlphabet": ["1"],
+  "tapeAlphabet": ["1", "_"],
+  "initialState": "q0",
+  "blank": "_",
+  "finalStates": ["q2"],
+  "transitions": [["q0", "1", "q0", "1", "R"], ["q0", "_", "q1", "_", "L"], ["q1", "1", "q2", "1", "R"]]
+}`
     }
   ];
 
