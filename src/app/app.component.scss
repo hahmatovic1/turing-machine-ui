@@ -14,6 +14,21 @@
   letter-spacing: 0.05em;
 }
 
+.tape-with-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tape-label-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.5rem;
+}
+
 .toggle-slider-container {
   display: flex;
   justify-content: center;
@@ -170,15 +185,15 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
 }
 
 .current-state {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.9rem;
+  gap: 1.25rem;
+  padding: 0.6rem 1rem;
   background-color: #f1f5f9;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
@@ -229,9 +244,6 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .control-btn {
@@ -270,6 +282,13 @@
     }
   }
 
+  &.step-btn {
+    &:hover:not(:disabled) {
+      background: #3b82f6;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    }
+  }
+
   &.revert-btn {
     &:hover:not(:disabled) {
       background: #f59e0b;
@@ -281,6 +300,24 @@
     background: #cbd5e1;
     box-shadow: none;
     cursor: not-allowed;
+  }
+}
+
+.step-counter {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+  padding-right: 0.5rem;
+
+  .step-label {
+    margin-right: 0.5rem;
+  }
+
+  .step-number {
+    font-family: 'Courier New', monospace;
+    color: #047857;
+    font-weight: 700;
   }
 }
 
@@ -400,26 +437,6 @@
   align-items: center;
   height: fit-content;
   white-space: nowrap;
-}
-
-.transition-info {
-  display: flex;
-  gap: 1rem;
-  padding: 0.6rem 1rem;
-  background-color: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-left: auto;
-  flex-shrink: 0;
-  align-items: center;
-
-  &.no-transition {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    margin-left: auto;
-  }
 }
 
 .transition-item {

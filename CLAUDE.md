@@ -1,85 +1,142 @@
-# CLAUDE.md — Bachelor Thesis Angular Project
+# Turing Machine Simulator
 
-## Project Overview
-This is a bachelor thesis web application built with Angular. It is a CRUD/dashboard app.
-When in doubt, prioritize clean, readable, well-structured code suitable for academic review.
+An interactive visual Turing Machine simulator for education and theory exploration. Supports both single-tape and multi-tape machines with step-by-step or automatic execution.
 
 ## Tech Stack
-- **Framework:** Angular (latest)
-- **Component style:** Standalone components (no NgModules)
+- **Framework:** Angular (standalone components)
 - **Styling:** SCSS
-- **State management:** Angular **signals** (primary) with services for business logic
-- **Backend/API:** (update: REST API / Firebase / mock data)
+- **State:** Angular signals
+- **Data:** JSON-based machine definitions
 
-## Code Style & Conventions
-- Use **standalone components** everywhere — never generate NgModule-based components
-- Use `inject()` instead of constructor injection for dependencies
-- **Use Angular signals for all state management** — `signal()`, `computed()`, `effect()`
-  - Signals replace async pipe in most cases; bind directly in templates with `{{ signalName() }}`
-  - Use `computed()` for derived state, `effect()` for side effects
-  - Prefer signals over RxJS Observables for local state
-- Use `HttpClient` with typed responses — always define interfaces for API data
-- File naming: `feature-name.component.ts`, `feature-name.service.ts`, etc.
-- Keep components small and focused — extract logic into services
-- Use component outputs (`@Output()` / `output()`) for parent-child communication
+## Core Components
 
-## Folder Structure
-```
-src/
-  app/
-    core/          # Singleton services, guards, interceptors
-    shared/        # Reusable components, pipes, directives
-    features/      # One folder per feature (e.g. /dashboard, /users)
-      feature-name/
-        feature-name.component.ts
-        feature-name.service.ts
-        feature-name.routes.ts
-    app.routes.ts
-    app.config.ts
-```
+### app.component
+Main orchestrator handling:
+- Machine configuration parsing and validation
+- Tape initialization and management
+- Execution engine (play, pause, step, reset)
+- Step counter and state tracking
 
-## Feature Development Instructions
-When writing new features, always:
-1. Create a **service** for all data fetching and business logic
-2. Create a **standalone component** that consumes the service via `inject()`
-3. Add a **route** to the appropriate `*.routes.ts` file
-4. Define **TypeScript interfaces** for all data models
-5. Handle loading and error states in the template
-6. Add basic **input validation** on forms using Angular Reactive Forms
+### tape.component
+Tape visualization with:
+- Single and multi-tape display
+- Read/write head position
+- Scroll navigation
+- Label support for multi-tape machines
 
-### Example pattern for a new CRUD feature:
+### examples.component
+Built-in examples:
+- Binary Incrementer
+- Bit Flip
+- Count Ones
+- Copy Input (two-tape)
+
+### Services
+**turing-machine.service**
+- Parses JSON configurations
+- Validates transitions
+- Generates example machines
+- Supports single and multi-tape formats
+
+## Data Models
+
 ```typescript
-// model
-export interface Item { id: number; name: string; }
-
-// service
-@Injectable({ providedIn: 'root' })
-export class ItemService {
-  private http = inject(HttpClient);
-  getAll() { return this.http.get<Item[]>('/api/items'); }
-  create(item: Omit<Item, 'id'>) { return this.http.post<Item>('/api/items', item); }
-  update(id: number, item: Partial<Item>) { return this.http.put<Item>(`/api/items/${id}`, item); }
-  delete(id: number) { return this.http.delete<void>(`/api/items/${id}`); }
+class TuringMachine {
+  numberOfTapes: number;
+  states: Set<string>;
+  inputAlphabet: Set<string>;
+  tapeAlphabet: Set<string>;
+  transitions: Transition[];
+  initialState: string;
+  blank: string;
+  finalStates: Set<string>;
 }
 
-// component
-@Component({ standalone: true, ... })
-export class ItemListComponent {
-  private service = inject(ItemService);
-  items = signal<Item[]>([]);
-  // ...
+interface Transition {
+  currentState: string;
+  readSymbols: string[];
+  nextState: string;
+  writeSymbols: string[];
+  moveDirections: MoveDirection[];
+}
+
+type MoveDirection = 'L' | 'R' | 'N';
+```
+
+## Configuration Format
+
+**Single-tape:**
+```json
+{
+  "numberOfTapes": 1,
+  "states": ["q0", "q1"],
+  "inputAlphabet": ["0", "1"],
+  "tapeAlphabet": ["0", "1", "_"],
+  "initialState": "q0",
+  "blank": "_",
+  "finalStates": ["q1"],
+  "transitions": [
+    ["q0", ["0"], "q0", ["0"], ["R"]],
+    ["q0", ["_"], "q1", ["_"], ["L"]]
+  ]
 }
 ```
 
-## What NOT to do
-- Do not use `ngModel` for complex forms — use Reactive Forms
-- Do not use `any` type — always type everything explicitly
-- Do not subscribe manually if the `async` pipe works
-- Do not create NgModules
-- Do not put business logic inside components
+**Multi-tape:** Same format but `numberOfTapes > 1` and arrays in transitions match tape count.
 
-## Thesis-Specific Notes
-- Code must be clean and readable — it will be reviewed by academic supervisors
-- Add JSDoc comments to services and non-obvious functions
-- Keep commits focused and descriptive
-- When generating boilerplate, follow the folder structure above exactly
+## Features
+- **Modes:** Play (automatic), Step (manual), Pause, Reset
+- **Display:** Current state, read symbols, next transition info
+- **Tracking:** Step counter, tape visualization
+- **Multi-tape:** Automatic detection and display based on config
+
+## Conventions
+
+### States & Symbols
+- States: `q0, q1, q2` (lowercase)
+- Symbols: `a, b, 0, 1` (standard)
+- Blank: `_` (underscore)
+- Movements: `R`, `L`, `N`
+
+### Components
+- Naming: `feature-name.component.ts`
+- State: Use `signal()` for local state
+- Inject: Use `inject(Service)` not constructor
+- Bind: `{{ signal() }}` in templates
+
+## Expanding the Project
+
+### Add an Example
+1. Add to `examples: Example[]` in `examples.component.ts`
+2. Include valid transitions matching your `numberOfTapes`
+3. Test in UI
+
+### Add a Feature
+1. Create service for business logic
+2. Create component with `inject(Service)`
+3. Add state with `signal()`
+4. Bind in template with `{{ signal() }}`
+
+### Modify Execution
+Edit `step()` method in `app.component.ts`:
+- `readSymbols` reads from all tapes
+- `writeSymbols` writes to all tapes
+- `moveDirections` moves each head independently
+
+### Change Visualization
+Edit `tape.component.ts`, `tape.component.html`, and `tape.component.scss`
+
+## File Structure
+```
+src/app/
+  core/services/
+    turing-machine.service.ts
+  shared/components/
+    tape/
+    examples/
+  app.component.ts
+  app.component.html
+  app.component.scss
+  models/
+    turing-machine.model.ts
+```

@@ -1,19 +1,31 @@
-<div class="tape-wrapper">
-  <button class="arrow-btn left-arrow" (click)="scrollLeft()" [disabled]="scrollIndex() === 0">
-    ◄
-  </button>
+<div class="tapes-container">
+  <div *ngFor="let tape of tapes(); let tapeIndex = index" class="tape-section">
+    <div class="tape-wrapper">
+      <button
+        class="arrow-btn left-arrow"
+        (click)="scrollLeft(tapeIndex)"
+        [disabled]="tape.scrollIndex === 0"
+      >
+        ◄
+      </button>
 
-  <div class="tape">
-    <div
-      *ngFor="let char of visibleCells; let i = index"
-      class="tape-cell"
-      [class.head-position]="i === headPositionInView"
-    >
-      {{ char || '_' }}
+      <div class="tape">
+        <div
+          *ngFor="let char of getVisibleCells(tapeIndex); let i = index"
+          class="tape-cell"
+          [class.head-position]="i === getHeadPositionInView(tapeIndex)"
+        >
+          {{ char || '_' }}
+        </div>
+      </div>
+
+      <button
+        class="arrow-btn right-arrow"
+        (click)="scrollRight(tapeIndex)"
+        [disabled]="tape.scrollIndex === getMaxScroll(tapeIndex)"
+      >
+        ►
+      </button>
     </div>
   </div>
-
-  <button class="arrow-btn right-arrow" (click)="scrollRight()" [disabled]="scrollIndex() === maxScroll">
-    ►
-  </button>
 </div>

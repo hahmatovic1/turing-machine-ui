@@ -27,29 +27,51 @@ export class AppComponent {
   dualTapeMode = signal<boolean>(false);
   initialState = signal<string>('');
   tapeValidationError = signal<string>('');
+  stepCount = signal<number>(0);
 
+  tapesContent = signal<string[][]>([]);
+  headsPosition = signal<number[]>([]);
+  // Legacy single-tape signals (maintained for backwards compatibility)
   tapeContent = signal<string[]>([]);
   headPosition = signal<number>(0);
   private stepInterval: number | null = null;
 
   isMachineValid = computed(() => this.configErrors().length === 0 && this.currentMachine() !== null);
 
-  currentReadSymbol = computed(() => {
-    const input = this.inputValue();
-    return input.length > 0 ? input[0] : this.currentMachine()?.blank || '—';
+  currentReadSymbols = computed(() => {
+    const machine = this.currentMachine();
+    if (!machine) return [];
+
+    const numberOfTapes = machine.numberOfTapes;
+    const symbols: string[] = [];
+
+    for (let i = 0; i < numberOfTapes; i++) {
+      if (i === 0) {
+        const input = this.inputValue();
+        symbols.push(input.length > 0 ? input[0] : machine.blank);
+      } else {
+        symbols.push(machine.blank);
+      }
+    }
+
+    return symbols;
   });
 
   nextTransition = computed(() => {
     const machine = this.currentMachine();
     const state = this.currentState();
-    const readSymbol = this.currentReadSymbol();
+    const readSymbols = this.currentReadSymbols();
 
-    if (!machine || !state) return null;
+    if (!machine || !state || readSymbols.length === 0) return null;
 
     return machine.transitions.find(
-      t => t.currentState === state && t.readSymbol === readSymbol
+      t => t.currentState === state && this.arraysEqual(t.readSymbols, readSymbols)
     ) || null;
   });
+
+  private arraysEqual(a: string[], b: string[]): boolean {
+    return a.length === b.length && a.every((v, i) => v === b[i]);
+  }
 
   onExampleSelected(exampleData: any): void {
     this.inputValue.set(exampleData.tapeInput);
@@ -106,6 +128,7 @@ export class AppComponent {
       this.currentState.set(machine.initialState);
       this.initialState.set(machine.initialState);
       this.isRunning.set(false);
+      this.stepCount.set(0);
       this.initializeTape();
     } else {
       this.currentMachine.set(null);
@@ -120,16 +143,34 @@ export class AppComponent {
 
     const inputStr = this.inputValue();
     const padding = 16;
+    const numberOfTapes = machine.numberOfTapes;
 
-    if (inputStr) {
-      const chars = inputStr.split('');
-      const paddedTape = Array(padding).fill(machine.blank).concat(chars).concat(Array(padding).fill(machine.blank));
-      this.tapeContent.set(paddedTape);
-      this.headPosition.set(padding);
-    } else {
-      const emptyTape = Array(padding * 2 + 8).fill(machine.blank);
-      this.tapeContent.set(emptyTape);
-      this.headPosition.set(padding);
+    const tapes: string[][] = [];
+    const heads: number[] = [];
+
+    for (let i = 0; i < numberOfTapes; i++) {
+      let tape: string[];
+
+      if (i === 0 && inputStr) {
+        // First tape gets the input
+        const chars = inputStr.split('');
+        tape = Array(padding).fill(machine.blank).concat(chars).concat(Array(padding).fill(machine.blank));
+      } else {
+        // Other tapes start empty
+        tape = Array(padding * 2 + 8).fill(machine.blank);
+      }
+
+      tapes.push(tape);
+      heads.push(padding);
+    }
+
+    this.tapesContent.set(tapes);
+    this.headsPosition.set(heads);
+
+    // Maintain backwards compatibility
+    if (tapes.length > 0) {
+      this.tapeContent.set(tapes[0]);
+      this.headPosition.set(heads[0]);
     }
   }
 
@@ -138,39 +179,83 @@ export class AppComponent {
     if (!machine) return;
 
     const state = this.currentState();
-    const tape = this.tapeContent();
-    const head = this.headPosition();
+    const tapes = this.tapesContent();
+    const heads = this.headsPosition();
 
-    const readSymbol = tape[head] || machine.blank;
+    // Read symbols from all tapes
+    const readSymbols = tapes.map((tape, i) => tape[heads[i]] || machine.blank);
 
     const transition = machine.transitions.find(
-      t => t.currentState === state && t.readSymbol === readSymbol
+      t => t.currentState === state && this.arraysEqual(t.readSymbols, readSymbols)
     );
 
     if (!transition) return;
 
-    const newTape = [...tape];
-    newTape[head] = transition.writeSymbol;
-    this.tapeContent.set(newTape);
+    // Update all tapes
+    const newTapes = tapes.map((tape, i) => {
+      const newTape = [...tape];
+      newTape[heads[i]] = transition.writeSymbols[i];
+      return newTape;
+    });
 
-    const newHead = transition.moveDirection === 'R' ? head + 1 : head - 1;
-    if (newHead >= 0 && newHead < tape.length) {
-      this.headPosition.set(newHead);
-    } else if (newHead >= tape.length) {
-      const machine_blank = machine.blank;
-      this.tapeContent.set([...newTape, machine_blank]);
-      this.headPosition.set(newHead);
-    } else if (newHead < 0) {
-      const machine_blank = machine.blank;
-      this.tapeContent.set([machine_blank, ...newTape]);
-      this.headPosition.set(0);
+    // Move all heads independently
+    const newHeads = heads.map((head, i) => {
+      const move = transition.moveDirections[i];
+      if (move === 'R') return head + 1;
+      if (move === 'L') return head - 1;
+      return head; // 'N' - no move
+    });
+
+    // Handle tape expansion for each tape independently
+    const finalTapes = newTapes.map((tape, i) => {
+      let finalTape = tape;
+      let finalHead = newHeads[i];
+
+      if (finalHead >= finalTape.length) {
+        finalTape = [...finalTape, machine.blank];
+      } else if (finalHead < 0) {
+        finalTape = [machine.blank, ...finalTape];
+        finalHead = 0;
+      }
+
+      newHeads[i] = finalHead;
+      return finalTape;
+    });
+
+    this.tapesContent.set(finalTapes);
+    this.headsPosition.set(newHeads);
+
+    // Maintain backwards compatibility
+    if (finalTapes.length > 0) {
+      this.tapeContent.set(finalTapes[0]);
+      this.headPosition.set(newHeads[0]);
     }
 
     this.currentState.set(transition.nextState);
+    this.stepCount.set(this.stepCount() + 1);
+  }
+
+  stepMachine(): void {
+    const machine = this.currentMachine();
+    if (!machine || this.isRunning()) return;
+
+    const state = this.currentState();
+    const tapes = this.tapesContent();
+    const heads = this.headsPosition();
+
+    const readSymbols = tapes.map((tape, i) => tape[heads[i]] || machine.blank);
+    const hasTransition = machine.transitions.some(
+      t => t.currentState === state && this.arraysEqual(t.readSymbols, readSymbols)
+    );
+
+    if (!hasTransition || machine.finalStates.has(state)) {
+      return;
+    }
+
+    this.step();
   }
 
   toggleDualTapeMode(): void {
-    console.log('Dual/Single toggle pressed');
     this.dualTapeMode.set(!this.dualTapeMode());
   }
 
@@ -185,12 +270,14 @@ export class AppComponent {
       }
 
       const state = this.currentState();
-      const tape = this.tapeContent();
-      const head = this.headPosition();
-      const readSymbol = tape[head] || machine.blank;
+      const tapes = this.tapesContent();
+      const heads = this.headsPosition();
+
+      // Read symbols from all tapes
+      const readSymbols = tapes.map((tape, i) => tape[heads[i]] || machine.blank);
 
       const hasTransition = machine.transitions.some(
-        t => t.currentState === state && t.readSymbol === readSymbol
+        t => t.currentState === state && this.arraysEqual(t.readSymbols, readSymbols)
       );
 
       if (!hasTransition || machine.finalStates.has(state)) {
@@ -213,6 +300,7 @@ export class AppComponent {
   revertMachine(): void {
     this.stopMachine();
     this.currentState.set(this.initialState());
+    this.stepCount.set(0);
     this.initializeTape();
   }
 
